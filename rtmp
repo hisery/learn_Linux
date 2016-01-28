@@ -39,7 +39,8 @@ git version 2.0.0.GIT
 
 2). zlib
 # wget http://zlib.net/zlib-1.2.8.tar.gz
-# tar -zxvf zlib-1.2.8.tar.gz cd zlib-1.2.8
+# tar -zxvf zlib-1.2.8.tar.gz 
+# cd zlib-1.2.8
 # ./configure
 # make
 # make install
@@ -71,6 +72,8 @@ yadmi的作用是为flv文件添加关键帧，才能实现拖动播放
 # ./config
 # make
 # make install
+在安装时如果出现如下错误:POD document had syntax errors at /usr/bin/pod2man line 69. make .那么,解决如下:
+rm /usr/bin/pod2man 
 
 3、安装ffmpeg及其依赖包：
 1). Yasm
@@ -119,6 +122,7 @@ yadmi的作用是为flv文件添加关键帧，才能实现拖动播放
 
 6). libvpx
 # git clone http://git.chromium.org/webm/libvpx.git
+# 或者 wget http://webm.googlecode.com/files/libvpx-v1.1.0.tar.bz2
 # cd libvpx
 # ./configure  --enable-shared
 # make
@@ -193,16 +197,12 @@ const char *strcasestr(const char *haystack, const char *needle);
 # ./configure
 # make
 # make install
-# cd ..
+# cd ../../../
 
 10). ffmpeg
 # git clone git://source.ffmpeg.org/ffmpeg
 # cd ffmpeg
-# ./configure  --prefix=/opt/ffmpeg/ --enable-version3  
---enable-libvpx --enable-libfaac --enable-libmp3lame  
---enable-libvorbis --enable-libx264 --enable-libxvid 
---enable-shared --enable-gpl --enable-postproc --enable-nonfree  
---enable-avfilter --enable-pthreads
+# ./configure  --prefix=/opt/ffmpeg/ --enable-version3 --enable-libvpx --enable-libfaac --enable-libmp3lame --enable-libvorbis --enable-libx264 --enable-libxvid --enable-shared --enable-gpl --enable-postproc --enable-nonfree --enable-avfilter --enable-pthreads
 # make && make install
 # cd ..
 
@@ -215,6 +215,7 @@ include ld.so.conf.d/*.conf
 /usr/local/lib
 /usr/local/lib64
 /opt/ffmpeg/lib
+
 # ldconfig
 
 二、安装Nginx相关模块
@@ -327,6 +328,7 @@ apt-get install libssl-dev
 b)也可以添加
 
 --with-openssl=<path>
+#path是openssl的安装路径
 
 在执行make的时候可能出现错误2：
 
@@ -352,7 +354,7 @@ make: *** [build] Error 2
 
 解决方法：
 
-那么将src/ngx_http_streaming_module.c文件中以下代码删除或者是注释掉就可以了：
+那么将nginx_mod_h264_streaming-2.2.7/src/ngx_http_streaming_module.c文件中以下代码删除或者是注释掉就可以了：
 
 /* TODO: Win32 */
 
@@ -756,6 +758,57 @@ sudo service nginx reload
 2.
 在开启之前记得要打开 1935端口。
 具体怎么打开此处不做介绍。
+
+#开启端口 ubuntu使用
+
+ubuntu中使用ufw 看是否安装和启用:
+
+#sudo dpkg --get-selections | grep ufw
+
+#sudo apt-get install ufw
+
+你应该检查下 UFW 是否已经在运行
+
+   #sudo ufw status
+
+如果你发现状态是： inactive , 意思是没有被激活或不起作用。
+
+启用:
+
+#sudo ufw enable
+
+禁用:
+
+#sudo ufw disable
+
+在防火墙被激活后，你可以向里面添加你自己的规则。如果你想看看默认的规则，可以输入
+
+  #sudo ufw status verbose
+
+   Status: active
+   Logging: on (low)
+   Default: deny (incoming), allow (outgoing)
+   New profiles: skip
+
+#默认是不允许所有外部访问连接的。如果你想远程连接你的机器，就得开放相应的端口。例如，你想用 ssh 来连接，下面是添加的命令
+sudo ufw allow ssh 或者看尼ssh配置的是哪个端口 直接 sudo ufw allow 22 (一般默认的是22,路径 看:http://blog.csdn.net/wang794686714/article/details/39100157,最后部分)
+
+#sudo ufw status
+ 
+  To      Action          From
+  --      -----------         ------
+  22      ALLOW           Anywhere
+  22      ALLOW           Anywhere (v6)
+ 
+
+如果你有很多条规则，想快速的在每条规则上加个序号数字的话，请使用 numbered 参数。
+
+#sudo ufw status numbered
+
+第一条规则的意思是所有通过22端口访问机器的 tcp 或 udp 数据包都是允许的。如果你希望仅允许 tcp 数据包访问应该怎么办？可以在服务端口后加个 tcp 参数。下面的示例及相应的输出。
+
+#sudo ufw allow ssh/tcp 或 ufw allow 22/tcp
+
 
 3.
 但是开启的时候命令行要这样去启动：
